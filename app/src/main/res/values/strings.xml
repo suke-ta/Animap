@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">アニマップ</string>
+
+    <!-- アニメ一覧画面 -->
+    <string name="anim_list_title">アニメ一覧</string>
+    <string name="title_activity_anim_map">Map</string>
+
+    <!-- アニメ詳細画面 -->
+    <string name="anim_detail_title">%s</string>
+    <string name="anim_title_text">タイトル</string>
+    <string name="anim_place_text">聖地</string>
+    <string name="anim_prefecture_text">都道府県</string>
+    <string name="anim_url_text">URL</string>
+
+</resources>

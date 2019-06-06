@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 詳細画面 -->
+    <dimen name="sub_text">12sp</dimen>
+    <dimen name="main_text">18sp</dimen>
+
+    <dimen name="sub_margin">5dp</dimen>
+    <dimen name="main_margin">10dp</dimen>
+</resources>
