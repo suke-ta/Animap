@@ -9,6 +9,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapFragment
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MarkerOptions
 import kotlinx.android.synthetic.main.activity_anim_detail.*
 
@@ -21,12 +22,16 @@ class AnimDetailActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mMap: GoogleMap
     private lateinit var mAnimDBAdapter: AnimDatabaseAdapter
     private lateinit var mAnimTitle: String
+    private var mMaxLongitude = 0.0
+    private var mMinLongitude = 0.0
+    private var mMaxLatitude = 0.0
+    private var mMinLatitude = 0.0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_anim_detail)
 
-        setDB()
+        createDB()
         // DB情報を読み込む
         mAnimDBAdapter.openDB()
 
@@ -94,25 +99,43 @@ class AnimDetailActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
-        val latitude = getLatitude()
-        val longitude = getLongitude()
-        val placeName = getPlace()
+        val latitudeList = getLatitude()
+        val longitudeList = getLongitude()
+        val placeNameList = getPlace()
 
         var index = 0
 
-        while (index < latitude.size) {
-            val placeInfo = LatLng(latitude[index].toDouble(), longitude[index].toDouble())
-            mMap.addMarker(MarkerOptions().position(placeInfo).title(placeName[index]))
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(placeInfo))
+        while (index < latitudeList.size) {
+            val latitude = latitudeList[index].toDouble()
+            val longitude = longitudeList[index].toDouble()
+            if (mMaxLatitude == 0.0 && mMaxLongitude == 0.0 && mMinLatitude == 0.0 && mMinLongitude == 0.0) {
+                mMaxLatitude = latitude
+                mMinLatitude = latitude
+                mMaxLongitude = longitude
+                mMinLongitude = longitude
+            }
+            setLatLng(latitude, longitude)
+            val placeInfo = LatLng(latitude, longitude)
+            mMap.addMarker(MarkerOptions().position(placeInfo).title(placeNameList[index]))
             index++
         }
-        mMap.moveCamera(CameraUpdateFactory.zoomTo(13F))
+        val sw = LatLng(mMinLatitude, mMinLongitude)
+        val ne = LatLng(mMaxLatitude, mMaxLongitude)
+        val bounds = LatLngBounds(sw, ne)
+        mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 300, 500, 10))
+    }
+
+    private fun setLatLng(latitude: Double, longitude: Double) {
+        if (mMaxLatitude < latitude) mMaxLatitude = latitude
+        if (mMinLatitude > latitude) mMinLatitude = latitude
+        if (mMaxLongitude < longitude) mMaxLongitude = longitude
+        if (mMinLongitude > longitude) mMinLongitude = longitude
     }
 
     /**
      * DBをセットする。
      */
-    private fun setDB() {
+    private fun createDB() {
         // DBが存在しないなら生成する
         mAnimDBAdapter = AnimDatabaseAdapter(this)
     }
