@@ -3,7 +3,6 @@
 
     <!-- アニメ一覧画面 -->
     <string name="anim_list_title">アニメ一覧</string>
-    <string name="title_activity_anim_map">Map</string>
 
     <!-- アニメ詳細画面 -->
     <string name="anim_detail_title">%s</string>

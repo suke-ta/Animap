@@ -38,10 +38,6 @@
                 android:value="@string/google_maps_key"/>
 
         <activity
-                android:name=".AnimMapActivity"
-                android:label="@string/title_activity_anim_map">
-        </activity>
-        <activity
                 android:name=".AnimDetailActivity"
                 android:parentActivityName=".AnimListActivity">
         </activity>
