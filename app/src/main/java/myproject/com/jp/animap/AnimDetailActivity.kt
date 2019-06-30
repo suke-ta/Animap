@@ -10,7 +10,11 @@ import com.google.android.gms.maps.MapFragment
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import kotlinx.android.synthetic.main.activity_anim_detail.*
 
+/**
+ * アニメ詳細画面のアクティビティ。
+ */
 class AnimDetailActivity : AppCompatActivity(), OnMapReadyCallback {
 
     /** GoogleMap。 */
@@ -30,12 +34,13 @@ class AnimDetailActivity : AppCompatActivity(), OnMapReadyCallback {
         title = mAnimTitle
 
         setMap()
-
         setText()
-
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
+    /**
+     * 詳細画面に表示するテキストをセットする。
+     */
     private fun setText() {
         anim_title.text = mAnimTitle
         anim_url.text = mAnimDBAdapter.getUrl(mAnimTitle)
@@ -44,7 +49,7 @@ class AnimDetailActivity : AppCompatActivity(), OnMapReadyCallback {
 
     /**
      * テキストにリンクをセットする。
-     * @param text リンクを付与する文字列
+     * @param textView リンクを付与する文字列
      */
     private fun setLink(textView: TextView) {
         Linkify.addLinks(textView, Linkify.ALL)
@@ -65,14 +70,23 @@ class AnimDetailActivity : AppCompatActivity(), OnMapReadyCallback {
         mapFragment.getMapAsync(this)
     }
 
+    /**
+     * 聖地の緯度を取得する。
+     */
     private fun getLatitude(): ArrayList<String> {
         return mAnimDBAdapter.getLatitude(mAnimTitle)
     }
 
+    /**
+     * 聖地の経度を取得する。
+     */
     private fun getLongitude(): ArrayList<String> {
         return mAnimDBAdapter.getLongitude(mAnimTitle)
     }
 
+    /**
+     * 聖地の場所を取得する。
+     */
     private fun getPlace(): ArrayList<String> {
         return mAnimDBAdapter.getPlace(mAnimTitle)
     }

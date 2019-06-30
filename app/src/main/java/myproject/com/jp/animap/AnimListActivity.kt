@@ -5,6 +5,9 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.widget.ListView
 
+/**
+ * アニメ一覧のアクティビティ。
+ */
 class AnimListActivity : AppCompatActivity() {
 
     private lateinit var mAnimDBAdapter: AnimDatabaseAdapter
