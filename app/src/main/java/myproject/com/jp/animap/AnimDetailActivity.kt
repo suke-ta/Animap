@@ -26,7 +26,7 @@ class AnimDetailActivity : AppCompatActivity(), OnMapReadyCallback {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_anim_detail)
 
-        setDB()
+        createDB()
         // DB情報を読み込む
         mAnimDBAdapter.openDB()
 
@@ -112,7 +112,7 @@ class AnimDetailActivity : AppCompatActivity(), OnMapReadyCallback {
     /**
      * DBをセットする。
      */
-    private fun setDB() {
+    private fun createDB() {
         // DBが存在しないなら生成する
         mAnimDBAdapter = AnimDatabaseAdapter(this)
     }
