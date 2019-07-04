@@ -52,6 +52,7 @@ class AnimListActivity : AppCompatActivity() {
 
             val intent = Intent(this, AnimDetailActivity::class.java)
             intent.putExtra("ANIM_TITLE", item.getAnimTitle())
+            intent.putExtra("ANIM_ICON", item.getAnimIcon())
             startActivity(intent)
         }
     }
@@ -73,7 +74,7 @@ class AnimListActivity : AppCompatActivity() {
         mItems = ArrayList()
 
         val animTitleList = mAnimDBAdapter.getAnimTitle()
-        var animIconList = mAnimDBAdapter.getAnimIcon()
+        val animIconList = mAnimDBAdapter.getAnimIcon()
 
         var count = 0
         while (count < animTitleList.size) {

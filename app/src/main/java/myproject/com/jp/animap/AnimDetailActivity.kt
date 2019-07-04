@@ -3,11 +3,13 @@ package myproject.com.jp.animap
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.text.util.Linkify
+import android.widget.ImageView
 import android.widget.TextView
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapFragment
 import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MarkerOptions
@@ -19,13 +21,37 @@ import kotlinx.android.synthetic.main.activity_anim_detail.*
 class AnimDetailActivity : AppCompatActivity(), OnMapReadyCallback {
 
     /** GoogleMap。 */
-    private lateinit var mMap: GoogleMap
-    private lateinit var mAnimDBAdapter: AnimDatabaseAdapter
-    private lateinit var mAnimTitle: String
-    private var mMaxLongitude = 0.0
-    private var mMinLongitude = 0.0
-    private var mMaxLatitude = 0.0
-    private var mMinLatitude = 0.0
+    private lateinit var map: GoogleMap
+    private lateinit var animDBAdapter: AnimDatabaseAdapter
+    private lateinit var animTitle: String
+    private var maxLongitude = 0.0
+    private var minLongitude = 0.0
+    private var maxLatitude = 0.0
+    private var minLatitude = 0.0
+
+    private val steinsgateImages: IntArray = intArrayOf(
+        R.drawable.steinsgate_image1,
+        R.drawable.steinsgate_image2
+    )
+
+    private val anohanaImages: IntArray = intArrayOf(
+        R.drawable.anohana_image1,
+        R.drawable.anohana_image2
+    )
+
+    private val uchotenImages: IntArray = intArrayOf(
+        R.drawable.uchoten_image1,
+        R.drawable.uchoten_image2,
+        R.drawable.uchoten_image3
+    )
+
+    private fun getImage(): Int {
+        return when (animTitle) {
+            "STEINS;GATE" -> R.drawable.steinsgate_image1
+            "あの日見た花の名前を僕達はまだ知らない" -> R.drawable.anohana_image1
+            else -> R.drawable.uchoten_image2
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,10 +59,13 @@ class AnimDetailActivity : AppCompatActivity(), OnMapReadyCallback {
 
         createDB()
         // DB情報を読み込む
-        mAnimDBAdapter.openDB()
+        animDBAdapter.openDB()
 
-        mAnimTitle = intent.getStringExtra("ANIM_TITLE")
-        title = mAnimTitle
+        animTitle = intent.getStringExtra("ANIM_TITLE")
+        title = animTitle
+
+        val imageView = findViewById<ImageView>(R.id.imageView)
+        imageView.setImageResource(getImage())
 
         setMap()
         setText()
@@ -47,8 +76,8 @@ class AnimDetailActivity : AppCompatActivity(), OnMapReadyCallback {
      * 詳細画面に表示するテキストをセットする。
      */
     private fun setText() {
-        anim_title.text = mAnimTitle
-        anim_url.text = mAnimDBAdapter.getUrl(mAnimTitle)
+        anim_title.text = animTitle
+        anim_url.text = animDBAdapter.getUrl(animTitle)
         setLink(anim_url)
     }
 
@@ -79,57 +108,72 @@ class AnimDetailActivity : AppCompatActivity(), OnMapReadyCallback {
      * 聖地の緯度を取得する。
      */
     private fun getLatitude(): ArrayList<String> {
-        return mAnimDBAdapter.getLatitude(mAnimTitle)
+        return animDBAdapter.getLatitude(animTitle)
     }
 
     /**
      * 聖地の経度を取得する。
      */
     private fun getLongitude(): ArrayList<String> {
-        return mAnimDBAdapter.getLongitude(mAnimTitle)
+        return animDBAdapter.getLongitude(animTitle)
     }
 
     /**
      * 聖地の場所を取得する。
      */
     private fun getPlace(): ArrayList<String> {
-        return mAnimDBAdapter.getPlace(mAnimTitle)
+        return animDBAdapter.getPlace(animTitle)
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
-        mMap = googleMap
+        map = googleMap
 
         val latitudeList = getLatitude()
         val longitudeList = getLongitude()
         val placeNameList = getPlace()
+
+        val animIconName =
+            when (animTitle) {
+                "STEINS;GATE" -> "steinsgate"
+                "あの日見た花の名前を僕達はまだ知らない" -> "anohana"
+                else -> "uchoten"
+            }
 
         var index = 0
 
         while (index < latitudeList.size) {
             val latitude = latitudeList[index].toDouble()
             val longitude = longitudeList[index].toDouble()
-            if (mMaxLatitude == 0.0 && mMaxLongitude == 0.0 && mMinLatitude == 0.0 && mMinLongitude == 0.0) {
-                mMaxLatitude = latitude
-                mMinLatitude = latitude
-                mMaxLongitude = longitude
-                mMinLongitude = longitude
+            if (maxLatitude == 0.0 && maxLongitude == 0.0 && minLatitude == 0.0 && minLongitude == 0.0) {
+                maxLatitude = latitude
+                minLatitude = latitude
+                maxLongitude = longitude
+                minLongitude = longitude
             }
             setLatLng(latitude, longitude)
             val placeInfo = LatLng(latitude, longitude)
-            mMap.addMarker(MarkerOptions().position(placeInfo).title(placeNameList[index]))
+            val mapIcon =
+                resources.getIdentifier(animIconName + "_map_icon" + (index + 1), "drawable", "myproject.com.jp.animap")
+            val bitmap = BitmapDescriptorFactory.fromResource(mapIcon)
+            map.addMarker(MarkerOptions().position(placeInfo).title(placeNameList[index]).icon(bitmap))
             index++
         }
-        val sw = LatLng(mMinLatitude, mMinLongitude)
-        val ne = LatLng(mMaxLatitude, mMaxLongitude)
+        val sw = LatLng(minLatitude, minLongitude)
+        val ne = LatLng(maxLatitude, maxLongitude)
         val bounds = LatLngBounds(sw, ne)
-        mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 300, 500, 10))
+        map.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 300, 500, 10))
     }
 
+    /**
+     * 緯度経度の最大最小をセットする。
+     * @param latitude 緯度
+     * @param longitude 経度
+     */
     private fun setLatLng(latitude: Double, longitude: Double) {
-        if (mMaxLatitude < latitude) mMaxLatitude = latitude
-        if (mMinLatitude > latitude) mMinLatitude = latitude
-        if (mMaxLongitude < longitude) mMaxLongitude = longitude
-        if (mMinLongitude > longitude) mMinLongitude = longitude
+        if (maxLatitude < latitude) maxLatitude = latitude
+        if (minLatitude > latitude) minLatitude = latitude
+        if (maxLongitude < longitude) maxLongitude = longitude
+        if (minLongitude > longitude) minLongitude = longitude
     }
 
     /**
@@ -137,6 +181,6 @@ class AnimDetailActivity : AppCompatActivity(), OnMapReadyCallback {
      */
     private fun createDB() {
         // DBが存在しないなら生成する
-        mAnimDBAdapter = AnimDatabaseAdapter(this)
+        animDBAdapter = AnimDatabaseAdapter(this)
     }
 }
